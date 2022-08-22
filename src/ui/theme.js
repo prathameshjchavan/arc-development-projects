@@ -159,6 +159,15 @@ export default createTheme({
 				},
 			},
 		},
+		MuiSvgIcon: {
+			styleOverrides: {
+				root: {
+					"&.MuiSelect-icon": {
+						fill: arcOrange,
+					},
+				},
+			},
+		},
 	},
 	breakpoints: {
 		values: {

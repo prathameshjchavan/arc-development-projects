@@ -20,10 +20,10 @@ import {
 	Radio,
 	Select,
 	MenuItem,
+	Button,
 	useTheme,
 	IconButton,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
@@ -55,6 +55,14 @@ function createData(
 
 export default function ProjectManager() {
 	const platformOptions = ["Web", "iOS", "Android"];
+	const featureOptions = [
+		"Photo/Video",
+		"GPS",
+		"File Transfer",
+		"Users/Authentication",
+		"Biometrics",
+		"Push Notifications",
+	];
 
 	const theme = useTheme();
 	const [websiteChecked, setWebsiteChecked] = useState(false);
@@ -112,6 +120,37 @@ export default function ProjectManager() {
 			"$1250"
 		),
 	]);
+
+	// functions
+	const addProject = () => {
+		setRows([
+			...rows,
+			createData(
+				name,
+				date,
+				service,
+				features.join(", "),
+				complexity,
+				platforms.join(", "),
+				users,
+				total
+			),
+		]);
+		setDialogOpen(false);
+	};
+
+	// sx props
+	const sx = {
+		button: {
+			color: "#fff",
+			backgroundColor: theme.palette.secondary.main,
+			borderRadius: 50,
+			textTransform: "none",
+			"&:hover": {
+				backgroundColor: theme.palette.secondary.light,
+			},
+		},
+	};
 
 	return (
 		<Grid container direction="column">
@@ -227,6 +266,7 @@ export default function ProjectManager() {
 			<Dialog
 				fullWidth
 				maxWidth="lg"
+				sx={{ zIndex: theme.zIndex.modal + 1 }}
 				open={dialogOpen}
 				onClose={() => setDialogOpen(false)}
 			>
@@ -241,7 +281,7 @@ export default function ProjectManager() {
 					<Grid container justifyContent="space-between">
 						{/* -----Name & Service----- */}
 						<Grid item>
-							<Grid item container direction="column" sm>
+							<Grid item container direction="column">
 								{/* -----Name TextField----- */}
 								<Grid item>
 									<TextField
@@ -263,6 +303,7 @@ export default function ProjectManager() {
 									<Grid item>
 										<Typography variant="h4">Service</Typography>
 									</Grid>
+									{/* -----Radio Inputs----- */}
 									<Grid item>
 										<RadioGroup
 											aria-label="service"
@@ -287,21 +328,29 @@ export default function ProjectManager() {
 											/>
 										</RadioGroup>
 									</Grid>
-									<Grid item>
-										<Select
-											labelId="platforms"
-											id="platform"
-											multiple
-											value={platforms}
-											onChange={(e) => setPlatforms(e.target.value)}
-										>
-											{platformOptions.map((option) => (
-												<MenuItem key={option} value={option}>
-													{option}
-												</MenuItem>
-											))}
-										</Select>
-									</Grid>
+								</Grid>
+								{/* -----Select Platforms----- */}
+								<Grid item sx={{ marginTop: "5em" }}>
+									<Select
+										variant="standard"
+										sx={{ width: "12em" }}
+										MenuProps={{ sx: { zIndex: theme.zIndex.modal + 2 } }}
+										labelId="platforms"
+										id="platform"
+										displayEmpty
+										renderValue={
+											platforms.length > 0 ? undefined : () => "Platforms"
+										}
+										multiple
+										value={platforms}
+										onChange={(e) => setPlatforms(e.target.value)}
+									>
+										{platformOptions.map((option) => (
+											<MenuItem key={option} value={option}>
+												{option}
+											</MenuItem>
+										))}
+									</Select>
 								</Grid>
 							</Grid>
 						</Grid>
@@ -313,7 +362,6 @@ export default function ProjectManager() {
 								sx={{ marginTop: "16px" }}
 								direction="column"
 								alignItems="center"
-								sm
 							>
 								{/* -----Date Picker----- */}
 								<Grid item>
@@ -384,7 +432,7 @@ export default function ProjectManager() {
 						</Grid>
 						{/* -----Total & Users----- */}
 						<Grid item>
-							<Grid item container direction="column" alignItems="flex-end" sm>
+							<Grid item container direction="column" alignItems="flex-end">
 								{/* -----Total TextField----- */}
 								<Grid item>
 									<TextField
@@ -408,36 +456,77 @@ export default function ProjectManager() {
 										direction="column"
 										sx={{ marginTop: "5em" }}
 									>
-										<Grid item>
-											<Typography variant="h4">Users</Typography>
-										</Grid>
-										<Grid item>
-											<RadioGroup
-												aria-label="users"
-												name="users"
-												value={users}
-												onChange={(e) => setUsers(e.target.value)}
-											>
-												<FormControlLabel
-													value="0-10"
-													label="0-10"
-													control={<Radio color="secondary" />}
-												/>
-												<FormControlLabel
-													value="10-100"
-													label="10-100"
-													control={<Radio color="secondary" />}
-												/>
-												<FormControlLabel
-													value="100+"
-													label="100+"
-													control={<Radio color="secondary" />}
-												/>
-											</RadioGroup>
+										<Grid item direction="column">
+											<Grid item>
+												<Typography variant="h4">Users</Typography>
+											</Grid>
+											{/* -----Radio Inputs----- */}
+											<Grid item>
+												<RadioGroup
+													aria-label="users"
+													name="users"
+													value={users}
+													onChange={(e) => setUsers(e.target.value)}
+												>
+													<FormControlLabel
+														value="0-10"
+														label="0-10"
+														control={<Radio color="secondary" />}
+													/>
+													<FormControlLabel
+														value="10-100"
+														label="10-100"
+														control={<Radio color="secondary" />}
+													/>
+													<FormControlLabel
+														value="100+"
+														label="100+"
+														control={<Radio color="secondary" />}
+													/>
+												</RadioGroup>
+											</Grid>
 										</Grid>
 									</Grid>
 								</Grid>
+								{/* -----Select Features----- */}
+								<Grid item sx={{ marginTop: "5em" }}>
+									<Select
+										variant="standard"
+										sx={{ width: "12em" }}
+										MenuProps={{ sx: { zIndex: theme.zIndex.modal + 2 } }}
+										labelId="features"
+										id="feature"
+										displayEmpty
+										renderValue={
+											features.length > 0 ? undefined : () => "Features"
+										}
+										multiple
+										value={features}
+										onChange={(e) => setFeatures(e.target.value)}
+									>
+										{featureOptions.map((option) => (
+											<MenuItem key={option} value={option}>
+												{option}
+											</MenuItem>
+										))}
+									</Select>
+								</Grid>
 							</Grid>
+						</Grid>
+					</Grid>
+					<Grid container justifyContent="center" sx={{ marginTop: "3em" }}>
+						<Grid item>
+							<Button
+								onClick={() => setDialogOpen(false)}
+								sx={{ fontWeight: 300 }}
+							>
+								Cancel
+							</Button>
+						</Grid>
+						<Grid item>
+							<Button onClick={addProject} variant="contained" sx={sx.button}>
+								Add Project +
+							</Button>
 						</Grid>
 					</Grid>
 				</DialogContent>
