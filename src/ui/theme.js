@@ -168,6 +168,13 @@ export default createTheme({
 				},
 			},
 		},
+		MuiDialog: {
+			styleOverrides: {
+				root: {
+					zIndex: 1302,
+				},
+			},
+		},
 	},
 	breakpoints: {
 		values: {

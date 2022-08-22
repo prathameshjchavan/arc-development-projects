@@ -456,7 +456,7 @@ export default function ProjectManager() {
 										direction="column"
 										sx={{ marginTop: "5em" }}
 									>
-										<Grid item direction="column">
+										<Grid item container direction="column">
 											<Grid item>
 												<Typography variant="h4">Users</Typography>
 											</Grid>
