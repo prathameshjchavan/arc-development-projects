@@ -125,6 +125,40 @@ export default createTheme({
 				},
 			},
 		},
+		MuiTableRow: {
+			styleOverrides: {
+				root: {
+					borderBottom: `2px solid ${arcBlue}`,
+				},
+			},
+		},
+		MuiTableCell: {
+			styleOverrides: {
+				root: {
+					textAlign: "center",
+					border: "none",
+				},
+				head: {
+					color: arcBlue,
+					fontSize: "1rem",
+					fontWeight: 700,
+				},
+				body: {
+					color: arcGrey,
+				},
+			},
+		},
+		MuiFormControlLabel: {
+			styleOverrides: {
+				root: {
+					marginRight: 0,
+				},
+				label: {
+					fontWeight: 300,
+					color: arcBlue,
+				},
+			},
+		},
 	},
 	breakpoints: {
 		values: {
