@@ -30,6 +30,7 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
+import { format } from "date-fns";
 
 function createData(
 	name,
@@ -91,7 +92,7 @@ export default function ProjectManager() {
 		),
 		createData(
 			"Elon Musk",
-			"11/02/2019",
+			"02/11/2019",
 			"Website",
 			"E-commerce",
 			"N/A",
@@ -101,7 +102,7 @@ export default function ProjectManager() {
 		),
 		createData(
 			"Bill Gates",
-			"10/07/2019",
+			"07/10/2019",
 			"Custom Software",
 			"GPS, Push Notifications, Users/Authentication, File Transfer",
 			"Medium",
@@ -111,7 +112,7 @@ export default function ProjectManager() {
 		),
 		createData(
 			"Elon Musk",
-			"11/02/2019",
+			"02/11/2019",
 			"Custom Software",
 			"Photo/Video, File Transfer, Users/Authentication",
 			"Low",
@@ -127,7 +128,7 @@ export default function ProjectManager() {
 			...rows,
 			createData(
 				name,
-				date,
+				format(date, "dd/MM/yyyy"),
 				service,
 				features.join(", "),
 				complexity,
