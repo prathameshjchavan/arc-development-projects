@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
 	Grid,
 	Typography,
@@ -6,6 +6,7 @@ import {
 	InputAdornment,
 	Switch,
 	FormGroup,
+	FormControl,
 	FormControlLabel,
 	Table,
 	TableBody,
@@ -56,7 +57,7 @@ function createData(
 
 export default function ProjectManager() {
 	const platformOptions = ["Web", "iOS", "Android"];
-	const featureOptions = [
+	const softwareOptions = [
 		"Photo/Video",
 		"GPS",
 		"File Transfer",
@@ -64,6 +65,7 @@ export default function ProjectManager() {
 		"Biometrics",
 		"Push Notifications",
 	];
+	const websiteOptions = ["Basic", "Interactive", "E-Commerce"];
 
 	const theme = useTheme();
 	const [websiteChecked, setWebsiteChecked] = useState(false);
@@ -79,6 +81,8 @@ export default function ProjectManager() {
 	const [users, setUsers] = useState("");
 	const [platforms, setPlatforms] = useState([]);
 	const [features, setFeatures] = useState([]);
+	const [website, setWebsite] = useState("");
+	const [search, setSearch] = useState("");
 	const [rows, setRows] = useState([
 		createData(
 			"Prathamesh Chavan",
@@ -121,24 +125,8 @@ export default function ProjectManager() {
 			"$1250"
 		),
 	]);
-
-	// functions
-	const addProject = () => {
-		setRows([
-			...rows,
-			createData(
-				name,
-				format(date, "dd/MM/yyyy"),
-				service,
-				features.join(", "),
-				complexity,
-				platforms.join(", "),
-				users,
-				total
-			),
-		]);
-		setDialogOpen(false);
-	};
+	const isWebsiteSelected = service === "Website";
+	const featureOptions = isWebsiteSelected ? websiteOptions : softwareOptions;
 
 	// sx props
 	const sx = {
@@ -153,6 +141,39 @@ export default function ProjectManager() {
 		},
 	};
 
+	// functions
+	const clearFormData = () => {
+		setName("");
+		setDate(new Date());
+		setTotal("");
+		setService("");
+		setComplexity("");
+		setUsers("");
+		setPlatforms([]);
+		setFeatures([]);
+		setWebsite("");
+	};
+
+	const addProject = () => {
+		setRows([
+			...rows,
+			createData(
+				name,
+				format(date, "dd/MM/yyyy"),
+				service,
+				features.join(", "),
+				isWebsiteSelected ? "N/A" : complexity,
+				isWebsiteSelected ? "N/A" : platforms.join(", "),
+				isWebsiteSelected ? "N/A" : users,
+				`$${total}`
+			),
+		]);
+		clearFormData();
+		setDialogOpen(false);
+	};
+
+	const handleSearch = () => {};
+
 	return (
 		<Grid container direction="column">
 			<Grid item style={{ marginTop: "2em", marginLeft: "5em" }}>
@@ -162,6 +183,8 @@ export default function ProjectManager() {
 				<TextField
 					variant="standard"
 					sx={{ width: "35em", marginLeft: "5em" }}
+					value={search}
+					onChange={handleSearch}
 					placeholder="Search project details or create a new entry."
 					InputProps={{
 						endAdornment: (
@@ -287,11 +310,11 @@ export default function ProjectManager() {
 								<Grid item>
 									<TextField
 										variant="standard"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
 										fullWidth
 										label="Name"
 										id="name"
-										value={name}
-										onChange={(e) => setName(e.target.value)}
 									/>
 								</Grid>
 								{/* -----Service----- */}
@@ -335,6 +358,7 @@ export default function ProjectManager() {
 									<Select
 										variant="standard"
 										sx={{ width: "12em" }}
+										disabled={isWebsiteSelected}
 										MenuProps={{ sx: { zIndex: theme.zIndex.modal + 2 } }}
 										labelId="platforms"
 										id="platform"
@@ -404,28 +428,30 @@ export default function ProjectManager() {
 											<Typography variant="h4">Complexity</Typography>
 										</Grid>
 										<Grid item>
-											<RadioGroup
-												aria-label="complexity"
-												name="complexity"
-												value={complexity}
-												onChange={(e) => setComplexity(e.target.value)}
-											>
-												<FormControlLabel
-													value="Low"
-													label="Low"
-													control={<Radio color="secondary" />}
-												/>
-												<FormControlLabel
-													value="Medium"
-													label="Medium"
-													control={<Radio color="secondary" />}
-												/>
-												<FormControlLabel
-													value="High"
-													label="High"
-													control={<Radio color="secondary" />}
-												/>
-											</RadioGroup>
+											<FormControl disabled={isWebsiteSelected}>
+												<RadioGroup
+													aria-label="complexity"
+													name="complexity"
+													value={complexity}
+													onChange={(e) => setComplexity(e.target.value)}
+												>
+													<FormControlLabel
+														value="Low"
+														label="Low"
+														control={<Radio color="secondary" />}
+													/>
+													<FormControlLabel
+														value="Medium"
+														label="Medium"
+														control={<Radio color="secondary" />}
+													/>
+													<FormControlLabel
+														value="High"
+														label="High"
+														control={<Radio color="secondary" />}
+													/>
+												</RadioGroup>
+											</FormControl>
 										</Grid>
 									</Grid>
 								</Grid>
@@ -439,6 +465,7 @@ export default function ProjectManager() {
 									<TextField
 										variant="standard"
 										value={total}
+										onChange={(e) => setTotal(e.target.value)}
 										id="total"
 										label="Total"
 										InputProps={{
@@ -446,7 +473,6 @@ export default function ProjectManager() {
 												<InputAdornment position="start">$</InputAdornment>
 											),
 										}}
-										onChange={(e) => setTotal(e.target.value)}
 									/>
 								</Grid>
 								{/* -----Users----- */}
@@ -463,28 +489,30 @@ export default function ProjectManager() {
 											</Grid>
 											{/* -----Radio Inputs----- */}
 											<Grid item>
-												<RadioGroup
-													aria-label="users"
-													name="users"
-													value={users}
-													onChange={(e) => setUsers(e.target.value)}
-												>
-													<FormControlLabel
-														value="0-10"
-														label="0-10"
-														control={<Radio color="secondary" />}
-													/>
-													<FormControlLabel
-														value="10-100"
-														label="10-100"
-														control={<Radio color="secondary" />}
-													/>
-													<FormControlLabel
-														value="100+"
-														label="100+"
-														control={<Radio color="secondary" />}
-													/>
-												</RadioGroup>
+												<FormControl disabled={isWebsiteSelected}>
+													<RadioGroup
+														aria-label="users"
+														name="users"
+														value={users}
+														onChange={(e) => setUsers(e.target.value)}
+													>
+														<FormControlLabel
+															value="0-10"
+															label="0-10"
+															control={<Radio color="secondary" />}
+														/>
+														<FormControlLabel
+															value="10-100"
+															label="10-100"
+															control={<Radio color="secondary" />}
+														/>
+														<FormControlLabel
+															value="100+"
+															label="100+"
+															control={<Radio color="secondary" />}
+														/>
+													</RadioGroup>
+												</FormControl>
 											</Grid>
 										</Grid>
 									</Grid>
@@ -499,11 +527,21 @@ export default function ProjectManager() {
 										id="feature"
 										displayEmpty
 										renderValue={
-											features.length > 0 ? undefined : () => "Features"
+											isWebsiteSelected
+												? website.length > 0
+													? undefined
+													: () => "Website"
+												: features.length > 0
+												? undefined
+												: () => "Features"
 										}
-										multiple
-										value={features}
-										onChange={(e) => setFeatures(e.target.value)}
+										value={isWebsiteSelected ? website : features}
+										multiple={isWebsiteSelected ? false : true}
+										onChange={(e) =>
+											isWebsiteSelected
+												? setWebsite(e.target.value)
+												: setFeatures(e.target.value)
+										}
 									>
 										{featureOptions.map((option) => (
 											<MenuItem key={option} value={option}>
@@ -518,14 +556,34 @@ export default function ProjectManager() {
 					<Grid container justifyContent="center" sx={{ marginTop: "3em" }}>
 						<Grid item>
 							<Button
-								onClick={() => setDialogOpen(false)}
+								onClick={() => {
+									setDialogOpen(false);
+									clearFormData();
+								}}
 								sx={{ fontWeight: 300 }}
 							>
 								Cancel
 							</Button>
 						</Grid>
 						<Grid item>
-							<Button onClick={addProject} variant="contained" sx={sx.button}>
+							<Button
+								disabled={
+									isWebsiteSelected
+										? name.length === 0 ||
+										  total.length === 0 ||
+										  website.length === 0
+										: name.length === 0 ||
+										  total.length === 0 ||
+										  features.length === 0 ||
+										  users.length === 0 ||
+										  complexity.length === 0 ||
+										  platforms.length === 0 ||
+										  service.length === 0
+								}
+								onClick={addProject}
+								variant="contained"
+								sx={sx.button}
+							>
 								Add Project +
 							</Button>
 						</Grid>
