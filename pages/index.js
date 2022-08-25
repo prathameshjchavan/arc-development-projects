@@ -41,7 +41,8 @@ function createData(
 	complexity,
 	platforms,
 	users,
-	total
+	total,
+	search
 ) {
 	return {
 		name,
@@ -52,6 +53,7 @@ function createData(
 		platforms,
 		users,
 		total,
+		search,
 	};
 }
 
@@ -92,7 +94,8 @@ export default function ProjectManager() {
 			"N/A",
 			"N/A",
 			"N/A",
-			"$4000"
+			"$4000",
+			true
 		),
 		createData(
 			"Elon Musk",
@@ -102,7 +105,8 @@ export default function ProjectManager() {
 			"N/A",
 			"N/A",
 			"N/A",
-			"$1500"
+			"$1500",
+			true
 		),
 		createData(
 			"Bill Gates",
@@ -112,7 +116,8 @@ export default function ProjectManager() {
 			"Medium",
 			"Web Application",
 			"0-10",
-			"$1600"
+			"$1600",
+			true
 		),
 		createData(
 			"Elon Musk",
@@ -122,7 +127,8 @@ export default function ProjectManager() {
 			"Low",
 			"Web Application",
 			"10-100",
-			"$1250"
+			"$1250",
+			true
 		),
 	]);
 	const isWebsiteSelected = service === "Website";
@@ -165,14 +171,36 @@ export default function ProjectManager() {
 				isWebsiteSelected ? "N/A" : complexity,
 				isWebsiteSelected ? "N/A" : platforms.join(", "),
 				isWebsiteSelected ? "N/A" : users,
-				`$${total}`
+				`$${total}`,
+				true
 			),
 		]);
 		clearFormData();
 		setDialogOpen(false);
 	};
 
-	const handleSearch = () => {};
+	const handleSearch = (e) => {
+		setSearch(e.target.value);
+
+		const rowData = rows.map((row) =>
+			Object.values(row).filter((option) => option !== true && option !== false)
+		);
+
+		const matches = rowData.map((row) =>
+			row.map((option) =>
+				option.toLowerCase().includes(e.target.value.toLowerCase())
+			)
+		);
+
+		const newRows = [...rows];
+		matches.map((row, index) =>
+			row.includes(true)
+				? (newRows[index].search = true)
+				: (newRows[index].search = false)
+		);
+
+		setRows(newRows);
+	};
 
 	return (
 		<Grid container direction="column">
@@ -271,18 +299,22 @@ export default function ProjectManager() {
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{rows.map((row, index) => (
-								<TableRow key={index}>
-									<TableCell>{row.name}</TableCell>
-									<TableCell>{row.date}</TableCell>
-									<TableCell>{row.service}</TableCell>
-									<TableCell sx={{ maxWidth: "5em" }}>{row.features}</TableCell>
-									<TableCell>{row.complexity}</TableCell>
-									<TableCell>{row.platforms}</TableCell>
-									<TableCell>{row.users}</TableCell>
-									<TableCell>{row.total}</TableCell>
-								</TableRow>
-							))}
+							{rows
+								.filter((row) => row.search)
+								.map((row, index) => (
+									<TableRow key={index}>
+										<TableCell>{row.name}</TableCell>
+										<TableCell>{row.date}</TableCell>
+										<TableCell>{row.service}</TableCell>
+										<TableCell sx={{ maxWidth: "5em" }}>
+											{row.features}
+										</TableCell>
+										<TableCell>{row.complexity}</TableCell>
+										<TableCell>{row.platforms}</TableCell>
+										<TableCell>{row.users}</TableCell>
+										<TableCell>{row.total}</TableCell>
+									</TableRow>
+								))}
 						</TableBody>
 					</Table>
 				</TableContainer>
