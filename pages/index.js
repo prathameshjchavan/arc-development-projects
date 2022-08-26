@@ -1,3 +1,4 @@
+// Module Imports
 import React, { useState, useRef } from "react";
 import {
 	Grid,
@@ -32,6 +33,9 @@ import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import { format } from "date-fns";
+
+// Local Imports
+import EnhancedTable from "../src/ui/enhancedTable";
 
 function createData(
 	name,
@@ -284,7 +288,7 @@ export default function ProjectManager() {
 				</Grid>
 			</Grid>
 			<Grid item sx={{ marginBottom: "15em" }}>
-				<TableContainer component={Paper} elevation={0}>
+				{/* <TableContainer component={Paper} elevation={0}>
 					<Table>
 						<TableHead>
 							<TableRow>
@@ -317,7 +321,8 @@ export default function ProjectManager() {
 								))}
 						</TableBody>
 					</Table>
-				</TableContainer>
+				</TableContainer> */}
+				<EnhancedTable rows={rows} />
 			</Grid>
 			<Dialog
 				fullWidth
