@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -14,6 +15,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
+import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -149,6 +151,12 @@ EnhancedTableHead.propTypes = {
 
 const EnhancedTableToolbar = (props) => {
 	const { numSelected } = props;
+	const [alert, setAlert] = useState({
+		open: false,
+		background: "#FF3232",
+		message: "",
+	});
+	const [undo, setUndo] = useState([]);
 
 	const onDelete = () => {
 		const newRows = [...props.rows];
@@ -158,6 +166,25 @@ const EnhancedTableToolbar = (props) => {
 		selectedRows.forEach((row) => {
 			row.search = false;
 		});
+		props.setRows(newRows);
+
+		setUndo(selectedRows);
+		props.setSelected([]);
+		setAlert({
+			...alert,
+			open: true,
+			message: selectedRows.length === 1 ? "Row deleted!" : "Rows deleted!",
+		});
+	};
+
+	const onUndo = () => {
+		setAlert({ ...alert, open: false });
+		const newRows = [...props.rows];
+		const redo = [...undo];
+		redo.forEach((row) => {
+			row.search = true;
+		});
+		Array.prototype.push.apply(newRows, ...redo);
 		props.setRows(newRows);
 	};
 
@@ -201,6 +228,30 @@ const EnhancedTableToolbar = (props) => {
 					</IconButton>
 				</Tooltip>
 			)}
+			<Snackbar
+				open={alert.open}
+				ContentProps={{
+					style: {
+						background: alert.background,
+					},
+				}}
+				anchorOrigin={{ vertical: "top", horizontal: "center" }}
+				message={alert.message}
+				onClose={(event, reason) => {
+					if (reason === "clickaway") {
+						console.log("closed");
+						setAlert({ ...alert, open: false });
+						const newRows = [...props.rows];
+						const ids = [...undo.map((row) => row.id)];
+						props.setRows(newRows.filter((row) => !ids.includes(row.id)));
+					}
+				}}
+				action={
+					<Button sx={{ color: "#fff" }} onClick={onUndo}>
+						Undo
+					</Button>
+				}
+			/>
 		</Toolbar>
 	);
 };
@@ -215,6 +266,7 @@ export default function EnhancedTable(props) {
 	const [selected, setSelected] = React.useState([]);
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
+	const filteredRows = props.rows.filter((row) => row.search);
 
 	const handleRequestSort = (event, property) => {
 		const isAsc = orderBy === property && order === "asc";
@@ -293,10 +345,7 @@ export default function EnhancedTable(props) {
 						<TableBody>
 							{/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-							{stableSort(
-								props.rows.filter((row) => row.search),
-								getComparator(order, orderBy)
-							)
+							{stableSort(filteredRows, getComparator(order, orderBy))
 								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 								.map((row, index) => {
 									const isItemSelected = isSelected(row.id);
@@ -304,6 +353,7 @@ export default function EnhancedTable(props) {
 
 									return (
 										<TableRow
+											hover
 											onClick={(event) => handleClick(event, row.id)}
 											role="checkbox"
 											aria-checked={isItemSelected}
@@ -347,9 +397,9 @@ export default function EnhancedTable(props) {
 				<TablePagination
 					rowsPerPageOptions={[5, 10, 25]}
 					component="div"
-					count={props.rows.filter((row) => row.search).length}
+					count={filteredRows.length}
 					rowsPerPage={rowsPerPage}
-					page={page}
+					page={filteredRows.length <= rowsPerPage ? 0 : page}
 					onPageChange={handleChangePage}
 					onRowsPerPageChange={handleChangeRowsPerPage}
 				/>
