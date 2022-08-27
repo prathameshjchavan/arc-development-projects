@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -173,7 +173,9 @@ const EnhancedTableToolbar = (props) => {
 				>
 					{numSelected} selected
 				</Typography>
-			) : null}
+			) : (
+				<Typography sx={{ flex: "1 1 100%" }}>{null}</Typography>
+			)}
 
 			{numSelected > 0 ? (
 				<Tooltip title="Delete">
@@ -248,6 +250,10 @@ export default function EnhancedTable(props) {
 	};
 
 	const isSelected = (id) => selected.indexOf(id) !== -1;
+
+	useEffect(() => {
+		setPage(0);
+	}, [props.rows]);
 
 	return (
 		<Box sx={{ width: "100%" }}>
@@ -324,7 +330,7 @@ export default function EnhancedTable(props) {
 				<TablePagination
 					rowsPerPageOptions={[5, 10, 25]}
 					component="div"
-					count={props.rows.length}
+					count={props.rows.filter((row) => row.search).length}
 					rowsPerPage={rowsPerPage}
 					page={page}
 					onPageChange={handleChangePage}

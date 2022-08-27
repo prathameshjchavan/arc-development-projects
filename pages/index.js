@@ -132,6 +132,42 @@ export default function ProjectManager() {
 			"$1250",
 			true
 		),
+		createData(
+			5,
+			"Mark Zuckerburg",
+			"02/11/2019",
+			"Custom Software",
+			"Photo/Video, File Transfer, Users/Authentication",
+			"Low",
+			"Web Application",
+			"10-100",
+			"$1250",
+			true
+		),
+		createData(
+			6,
+			"Gaurav Chaudhary",
+			"02/11/2019",
+			"Custom Software",
+			"Photo/Video, File Transfer, Users/Authentication",
+			"Low",
+			"Web Application",
+			"10-100",
+			"$1250",
+			true
+		),
+		createData(
+			7,
+			"Marques Brownlee",
+			"02/11/2019",
+			"Custom Software",
+			"Photo/Video, File Transfer, Users/Authentication",
+			"Low",
+			"Web Application",
+			"10-100",
+			"$1250",
+			true
+		),
 	]);
 	const isWebsiteSelected = service === "Website";
 	const featureOptions = isWebsiteSelected ? websiteOptions : softwareOptions;
