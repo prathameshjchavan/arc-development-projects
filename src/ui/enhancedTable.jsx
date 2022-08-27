@@ -150,6 +150,17 @@ EnhancedTableHead.propTypes = {
 const EnhancedTableToolbar = (props) => {
 	const { numSelected } = props;
 
+	const onDelete = () => {
+		const newRows = [...props.rows];
+		const selectedRows = newRows.filter((row) =>
+			props.selected.includes(row.id)
+		);
+		selectedRows.forEach((row) => {
+			row.search = false;
+		});
+		props.setRows(newRows);
+	};
+
 	return (
 		<Toolbar
 			sx={{
@@ -179,7 +190,7 @@ const EnhancedTableToolbar = (props) => {
 
 			{numSelected > 0 ? (
 				<Tooltip title="Delete">
-					<IconButton>
+					<IconButton aria-label="delete" onClick={onDelete}>
 						<DeleteIcon sx={{ fontSize: 30 }} color="primary" />
 					</IconButton>
 				</Tooltip>
@@ -258,7 +269,13 @@ export default function EnhancedTable(props) {
 	return (
 		<Box sx={{ width: "100%" }}>
 			<Paper elevation={0} sx={{ width: "100%", mb: 2 }}>
-				<EnhancedTableToolbar numSelected={selected.length} />
+				<EnhancedTableToolbar
+					rows={props.rows}
+					setRows={props.setRows}
+					selected={selected}
+					setSelected={setSelected}
+					numSelected={selected.length}
+				/>
 				<TableContainer>
 					<Table
 						sx={{ minWidth: 750 }}

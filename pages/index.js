@@ -355,7 +355,7 @@ export default function ProjectManager() {
 						</TableBody>
 					</Table>
 				</TableContainer> */}
-				<EnhancedTable rows={rows} />
+				<EnhancedTable rows={rows} setRows={setRows} />
 			</Grid>
 			<Dialog
 				fullWidth
