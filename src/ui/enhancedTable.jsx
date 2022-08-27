@@ -103,7 +103,7 @@ function EnhancedTableHead(props) {
 			<TableRow>
 				<TableCell padding="checkbox">
 					<Checkbox
-						color="primary"
+						color="secondary"
 						indeterminate={numSelected > 0 && numSelected < rowCount}
 						checked={rowCount > 0 && numSelected === rowCount}
 						onChange={onSelectAllClick}
@@ -115,10 +115,11 @@ function EnhancedTableHead(props) {
 				{headCells.map((headCell) => (
 					<TableCell
 						key={headCell.id}
-						align={headCell.numeric ? "right" : "left"}
+						align="center"
 						sortDirection={orderBy === headCell.id ? order : false}
 					>
 						<TableSortLabel
+							hideSortIcon
 							active={orderBy === headCell.id}
 							direction={orderBy === headCell.id ? order : "asc"}
 							onClick={createSortHandler(headCell.id)}
@@ -157,7 +158,7 @@ const EnhancedTableToolbar = (props) => {
 				...(numSelected > 0 && {
 					bgcolor: (theme) =>
 						alpha(
-							theme.palette.primary.main,
+							theme.palette.secondary.main,
 							theme.palette.action.activatedOpacity
 						),
 				}),
@@ -165,8 +166,8 @@ const EnhancedTableToolbar = (props) => {
 		>
 			{numSelected > 0 ? (
 				<Typography
-					sx={{ flex: "1 1 100%" }}
-					color="inherit"
+					sx={{ flex: "1 1 100%", fontWeight: "400" }}
+					color="secondary"
 					variant="subtitle1"
 					component="div"
 				>
@@ -177,13 +178,13 @@ const EnhancedTableToolbar = (props) => {
 			{numSelected > 0 ? (
 				<Tooltip title="Delete">
 					<IconButton>
-						<DeleteIcon />
+						<DeleteIcon sx={{ fontSize: 30 }} color="primary" />
 					</IconButton>
 				</Tooltip>
 			) : (
 				<Tooltip title="Filter list">
 					<IconButton>
-						<FilterListIcon />
+						<FilterListIcon sx={{ fontSize: 50 }} color="secondary" />
 					</IconButton>
 				</Tooltip>
 			)}
@@ -210,19 +211,19 @@ export default function EnhancedTable(props) {
 
 	const handleSelectAllClick = (event) => {
 		if (event.target.checked) {
-			const newSelected = props.rows.map((n) => n.name);
+			const newSelected = props.rows.map((n) => n.id);
 			setSelected(newSelected);
 			return;
 		}
 		setSelected([]);
 	};
 
-	const handleClick = (event, name) => {
-		const selectedIndex = selected.indexOf(name);
+	const handleClick = (event, id) => {
+		const selectedIndex = selected.indexOf(id);
 		let newSelected = [];
 
 		if (selectedIndex === -1) {
-			newSelected = newSelected.concat(selected, name);
+			newSelected = newSelected.concat(selected, id);
 		} else if (selectedIndex === 0) {
 			newSelected = newSelected.concat(selected.slice(1));
 		} else if (selectedIndex === selected.length - 1) {
@@ -246,15 +247,11 @@ export default function EnhancedTable(props) {
 		setPage(0);
 	};
 
-	const isSelected = (name) => selected.indexOf(name) !== -1;
-
-	// Avoid a layout jump when reaching the last page with empty rows.
-	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.rows.length) : 0;
+	const isSelected = (id) => selected.indexOf(id) !== -1;
 
 	return (
 		<Box sx={{ width: "100%" }}>
-			<Paper sx={{ width: "100%", mb: 2 }}>
+			<Paper elevation={0} sx={{ width: "100%", mb: 2 }}>
 				<EnhancedTableToolbar numSelected={selected.length} />
 				<TableContainer>
 					<Table
@@ -273,25 +270,27 @@ export default function EnhancedTable(props) {
 						<TableBody>
 							{/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-							{stableSort(props.rows, getComparator(order, orderBy))
+							{stableSort(
+								props.rows.filter((row) => row.search),
+								getComparator(order, orderBy)
+							)
 								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 								.map((row, index) => {
-									const isItemSelected = isSelected(row.name);
+									const isItemSelected = isSelected(row.id);
 									const labelId = `enhanced-table-checkbox-${index}`;
 
 									return (
 										<TableRow
-											hover
-											onClick={(event) => handleClick(event, row.name)}
+											onClick={(event) => handleClick(event, row.id)}
 											role="checkbox"
 											aria-checked={isItemSelected}
 											tabIndex={-1}
-											key={index}
+											key={row.id}
 											selected={isItemSelected}
 										>
 											<TableCell padding="checkbox">
 												<Checkbox
-													color="primary"
+													color="secondary"
 													checked={isItemSelected}
 													inputProps={{
 														"aria-labelledby": labelId,
@@ -319,15 +318,6 @@ export default function EnhancedTable(props) {
 										</TableRow>
 									);
 								})}
-							{emptyRows > 0 && (
-								<TableRow
-									style={{
-										height: 53 * emptyRows,
-									}}
-								>
-									<TableCell colSpan={6} />
-								</TableRow>
-							)}
 						</TableBody>
 					</Table>
 				</TableContainer>

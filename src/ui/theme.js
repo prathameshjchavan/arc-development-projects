@@ -175,6 +175,30 @@ export default createTheme({
 				},
 			},
 		},
+		MuiTableBody: {
+			styleOverrides: {
+				root: {
+					"& .Mui-selected": {
+						background: "#e8e8e8 !important",
+					},
+				},
+			},
+		},
+		MuiTableSortLabel: {
+			styleOverrides: {
+				root: {
+					"&.Mui-active": {
+						color: arcOrange,
+					},
+					"&:hover": {
+						color: arcOrange,
+					},
+				},
+				icon: {
+					fill: arcOrange,
+				},
+			},
+		},
 	},
 	breakpoints: {
 		values: {

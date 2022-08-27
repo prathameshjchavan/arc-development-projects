@@ -9,13 +9,6 @@ import {
 	FormGroup,
 	FormControl,
 	FormControlLabel,
-	Table,
-	TableBody,
-	TableHead,
-	TableContainer,
-	TableRow,
-	TableCell,
-	Paper,
 	Dialog,
 	DialogContent,
 	RadioGroup,
@@ -30,7 +23,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import AddIcon from "@mui/icons-material/Add";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import { format } from "date-fns";
 
@@ -38,6 +30,7 @@ import { format } from "date-fns";
 import EnhancedTable from "../src/ui/enhancedTable";
 
 function createData(
+	id,
 	name,
 	date,
 	service,
@@ -49,6 +42,7 @@ function createData(
 	search
 ) {
 	return {
+		id,
 		name,
 		date,
 		service,
@@ -91,6 +85,7 @@ export default function ProjectManager() {
 	const [search, setSearch] = useState("");
 	const [rows, setRows] = useState([
 		createData(
+			1,
 			"Prathamesh Chavan",
 			"20/08/2022",
 			"Website",
@@ -102,6 +97,7 @@ export default function ProjectManager() {
 			true
 		),
 		createData(
+			2,
 			"Elon Musk",
 			"02/11/2019",
 			"Website",
@@ -113,6 +109,7 @@ export default function ProjectManager() {
 			true
 		),
 		createData(
+			3,
 			"Bill Gates",
 			"07/10/2019",
 			"Custom Software",
@@ -124,6 +121,7 @@ export default function ProjectManager() {
 			true
 		),
 		createData(
+			4,
 			"Elon Musk",
 			"02/11/2019",
 			"Custom Software",
@@ -168,6 +166,7 @@ export default function ProjectManager() {
 		setRows([
 			...rows,
 			createData(
+				rows[rows.length - 1].id + 1,
 				name,
 				format(date, "dd/MM/yyyy"),
 				service,
@@ -187,7 +186,10 @@ export default function ProjectManager() {
 		setSearch(e.target.value);
 
 		const rowData = rows.map((row) =>
-			Object.values(row).filter((option) => option !== true && option !== false)
+			Object.values(row).filter(
+				(option) =>
+					option !== true && option !== false && typeof option !== "number"
+			)
 		);
 
 		const matches = rowData.map((row) =>
@@ -281,11 +283,6 @@ export default function ProjectManager() {
 						labelPlacement="start"
 					/>
 				</FormGroup>
-			</Grid>
-			<Grid item container justifyContent="flex-end" sx={{ marginTop: "5em" }}>
-				<Grid item sx={{ marginRight: "75px" }}>
-					<FilterListIcon color="secondary" sx={{ fontSize: 50 }} />
-				</Grid>
 			</Grid>
 			<Grid item sx={{ marginBottom: "15em" }}>
 				{/* <TableContainer component={Paper} elevation={0}>
