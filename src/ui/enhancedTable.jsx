@@ -239,7 +239,6 @@ const EnhancedTableToolbar = (props) => {
 				message={alert.message}
 				onClose={(event, reason) => {
 					if (reason === "clickaway") {
-						console.log("closed");
 						setAlert({ ...alert, open: false });
 						const newRows = [...props.rows];
 						const ids = [...undo.map((row) => row.id)];
@@ -266,7 +265,6 @@ export default function EnhancedTable(props) {
 	const [selected, setSelected] = React.useState([]);
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
-	const filteredRows = props.rows.filter((row) => row.search);
 
 	const handleRequestSort = (event, property) => {
 		const isAsc = orderBy === property && order === "asc";
@@ -313,6 +311,39 @@ export default function EnhancedTable(props) {
 	};
 
 	const isSelected = (id) => selected.indexOf(id) !== -1;
+
+	const switchFilters = () => {
+		const { websiteChecked, androidChecked, iOSChecked, softwareChecked } =
+			props;
+
+		const websites = props.rows.filter((row) =>
+			websiteChecked ? row.service === "Website" : null
+		);
+		const iOSApps = props.rows.filter((row) =>
+			iOSChecked ? row.platforms.includes("iOS") : null
+		);
+		const androidApps = props.rows.filter((row) =>
+			androidChecked ? row.platforms.includes("Android") : null
+		);
+		const softwareApps = props.rows.filter((row) =>
+			softwareChecked ? row.service === "Custom Software" : null
+		);
+
+		if (!websiteChecked && !iOSChecked && !androidChecked && !softwareChecked) {
+			return props.rows;
+		} else {
+			let filteredRowIds = [];
+			const rows = [...websites, ...iOSApps, ...androidApps, ...softwareApps];
+			const uniqueRows = rows.filter((row) => {
+				const toAddRow = !filteredRowIds.includes(row.id);
+				if (toAddRow) filteredRowIds.push(row.id);
+				return toAddRow;
+			});
+			return uniqueRows;
+		}
+	};
+
+	const filteredRows = switchFilters().filter((row) => row.search);
 
 	useEffect(() => {
 		setPage(0);

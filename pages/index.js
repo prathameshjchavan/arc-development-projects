@@ -112,10 +112,10 @@ export default function ProjectManager() {
 			3,
 			"Bill Gates",
 			"07/10/2019",
-			"Custom Software",
+			"Mobile App",
 			"GPS, Push Notifications, Users/Authentication, File Transfer",
 			"Medium",
-			"Web Application",
+			"iOS, Android",
 			"0-10",
 			"$1600",
 			true
@@ -136,10 +136,10 @@ export default function ProjectManager() {
 			5,
 			"Mark Zuckerburg",
 			"02/11/2019",
-			"Custom Software",
+			"Mobile App",
 			"Photo/Video, File Transfer, Users/Authentication",
 			"Low",
-			"Web Application",
+			"Android",
 			"10-100",
 			"$1250",
 			true
@@ -160,10 +160,10 @@ export default function ProjectManager() {
 			7,
 			"Marques Brownlee",
 			"02/11/2019",
-			"Custom Software",
+			"Mobile App",
 			"Photo/Video, File Transfer, Users/Authentication",
 			"Low",
-			"Web Application",
+			"iOS",
 			"10-100",
 			"$1250",
 			true
@@ -321,41 +321,14 @@ export default function ProjectManager() {
 				</FormGroup>
 			</Grid>
 			<Grid item sx={{ marginBottom: "15em" }}>
-				{/* <TableContainer component={Paper} elevation={0}>
-					<Table>
-						<TableHead>
-							<TableRow>
-								<TableCell>Name</TableCell>
-								<TableCell>Date</TableCell>
-								<TableCell>Service</TableCell>
-								<TableCell>Features</TableCell>
-								<TableCell>Complexity</TableCell>
-								<TableCell>Platforms</TableCell>
-								<TableCell>Users</TableCell>
-								<TableCell>Total</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{rows
-								.filter((row) => row.search)
-								.map((row, index) => (
-									<TableRow key={index}>
-										<TableCell>{row.name}</TableCell>
-										<TableCell>{row.date}</TableCell>
-										<TableCell>{row.service}</TableCell>
-										<TableCell sx={{ maxWidth: "5em" }}>
-											{row.features}
-										</TableCell>
-										<TableCell>{row.complexity}</TableCell>
-										<TableCell>{row.platforms}</TableCell>
-										<TableCell>{row.users}</TableCell>
-										<TableCell>{row.total}</TableCell>
-									</TableRow>
-								))}
-						</TableBody>
-					</Table>
-				</TableContainer> */}
-				<EnhancedTable rows={rows} setRows={setRows} />
+				<EnhancedTable
+					rows={rows}
+					setRows={setRows}
+					softwareChecked={softwareChecked}
+					androidChecked={androidChecked}
+					iOSChecked={iOSChecked}
+					websiteChecked={websiteChecked}
+				/>
 			</Grid>
 			<Dialog
 				fullWidth
