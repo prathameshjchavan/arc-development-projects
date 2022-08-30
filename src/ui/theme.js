@@ -199,6 +199,18 @@ export default createTheme({
 				},
 			},
 		},
+		MuiMenuItem: {
+			styleOverrides: {
+				root: {
+					"&:hover": {
+						background: "transparent",
+					},
+					"&.Mui-focusVisible": {
+						background: "transparent",
+					},
+				},
+			},
+		},
 	},
 	breakpoints: {
 		values: {

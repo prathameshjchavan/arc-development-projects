@@ -18,6 +18,7 @@ import {
 	Button,
 	useTheme,
 	IconButton,
+	useMediaQuery,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -171,6 +172,7 @@ export default function ProjectManager() {
 	]);
 	const isWebsiteSelected = service === "Website";
 	const featureOptions = isWebsiteSelected ? websiteOptions : softwareOptions;
+	const matchesMD = useMediaQuery(theme.breakpoints.down("md"));
 
 	// sx props
 	const sx = {
@@ -245,14 +247,24 @@ export default function ProjectManager() {
 	};
 
 	return (
-		<Grid container direction="column">
-			<Grid item style={{ marginTop: "2em", marginLeft: "5em" }}>
+		<Grid
+			container
+			direction="column"
+			alignItems={matchesMD ? "center" : undefined}
+		>
+			<Grid
+				item
+				style={{ marginTop: "2em", marginLeft: matchesMD ? 0 : "5em" }}
+			>
 				<Typography variant="h1">Projects</Typography>
 			</Grid>
 			<Grid item>
 				<TextField
 					variant="standard"
-					sx={{ width: "35em", marginLeft: "5em" }}
+					sx={{
+						width: matchesMD ? "25em" : "35em",
+						marginLeft: matchesMD ? 0 : "5em",
+					}}
 					value={search}
 					onChange={handleSearch}
 					placeholder="Search project details or create a new entry."
@@ -269,58 +281,72 @@ export default function ProjectManager() {
 					}}
 				/>
 			</Grid>
-			<Grid item sx={{ marginLeft: "5em", marginTop: "2em" }}>
+			<Grid item sx={{ marginLeft: matchesMD ? 0 : "5em", marginTop: "2em" }}>
 				<FormGroup row>
-					<FormControlLabel
-						sx={{ marginRight: "5em" }}
-						control={
-							<Switch
-								checked={websiteChecked}
-								color="primary"
-								onChange={() => setWebsiteChecked(!websiteChecked)}
+					<Grid
+						container
+						direction={matchesMD ? "column" : "row"}
+						justifyContent={matchesMD ? "center" : undefined}
+					>
+						<Grid item>
+							<FormControlLabel
+								sx={{ marginRight: "5em" }}
+								control={
+									<Switch
+										checked={websiteChecked}
+										color="primary"
+										onChange={() => setWebsiteChecked(!websiteChecked)}
+									/>
+								}
+								label="Websites"
+								labelPlacement={matchesMD ? "end" : "start"}
 							/>
-						}
-						label="Websites"
-						labelPlacement="start"
-					/>
-					<FormControlLabel
-						sx={{ marginRight: "5em" }}
-						control={
-							<Switch
-								checked={iOSChecked}
-								color="primary"
-								onChange={() => setiOSChecked(!iOSChecked)}
+						</Grid>
+						<Grid item>
+							<FormControlLabel
+								sx={{ marginRight: matchesMD ? 0 : "5em" }}
+								control={
+									<Switch
+										checked={iOSChecked}
+										color="primary"
+										onChange={() => setiOSChecked(!iOSChecked)}
+									/>
+								}
+								label="iOS Apps"
+								labelPlacement={matchesMD ? "end" : "start"}
 							/>
-						}
-						label="iOS Apps"
-						labelPlacement="start"
-					/>
-					<FormControlLabel
-						sx={{ marginRight: "5em" }}
-						control={
-							<Switch
-								checked={androidChecked}
-								color="primary"
-								onChange={() => setAndroidChecked(!androidChecked)}
+						</Grid>
+						<Grid item>
+							<FormControlLabel
+								sx={{ marginRight: matchesMD ? 0 : "5em" }}
+								control={
+									<Switch
+										checked={androidChecked}
+										color="primary"
+										onChange={() => setAndroidChecked(!androidChecked)}
+									/>
+								}
+								label="Android Apps"
+								labelPlacement={matchesMD ? "end" : "start"}
 							/>
-						}
-						label="Android Apps"
-						labelPlacement="start"
-					/>
-					<FormControlLabel
-						control={
-							<Switch
-								checked={softwareChecked}
-								color="primary"
-								onChange={() => setSoftwareChecked(!softwareChecked)}
+						</Grid>
+						<Grid item>
+							<FormControlLabel
+								control={
+									<Switch
+										checked={softwareChecked}
+										color="primary"
+										onChange={() => setSoftwareChecked(!softwareChecked)}
+									/>
+								}
+								label="Custom Software"
+								labelPlacement={matchesMD ? "end" : "start"}
 							/>
-						}
-						label="Custom Software"
-						labelPlacement="start"
-					/>
+						</Grid>
+					</Grid>
 				</FormGroup>
 			</Grid>
-			<Grid item sx={{ marginBottom: "15em" }}>
+			<Grid item sx={{ marginBottom: "15em", maxWidth: "100% !important" }}>
 				<EnhancedTable
 					rows={rows}
 					setRows={setRows}

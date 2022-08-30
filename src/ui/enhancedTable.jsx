@@ -18,9 +18,16 @@ import Checkbox from "@mui/material/Checkbox";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Chip from "@mui/material/Chip";
+import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
+import { useTheme } from "@mui/material";
 
 function descendingComparator(a, b, orderBy) {
 	if (b[orderBy] < a[orderBy]) {
@@ -157,13 +164,16 @@ const EnhancedTableToolbar = (props) => {
 		message: "",
 	});
 	const [undo, setUndo] = useState([]);
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [openMenu, setOpenMenu] = useState(false);
+	const theme = useTheme();
 
 	const onDelete = () => {
 		const newRows = [...props.rows];
 		const selectedRows = newRows.filter((row) =>
 			props.selected.includes(row.id)
 		);
-		selectedRows.forEach((row) => {
+		selectedRows.map((row) => {
 			row.search = false;
 		});
 		props.setRows(newRows);
@@ -181,11 +191,61 @@ const EnhancedTableToolbar = (props) => {
 		setAlert({ ...alert, open: false });
 		const newRows = [...props.rows];
 		const redo = [...undo];
-		redo.forEach((row) => {
+		redo.map((row) => {
 			row.search = true;
 		});
 		Array.prototype.push.apply(newRows, ...redo);
 		props.setRows(newRows);
+	};
+
+	const handleClick = (e) => {
+		setAnchorEl(e.currentTarget);
+		setOpenMenu(true);
+	};
+
+	const handleClose = (e) => {
+		setAnchorEl(null);
+		setOpenMenu(false);
+	};
+
+	const handleTotalFilter = (e) => {
+		if (!isNaN(e.target.value)) {
+			props.setFilterPrice(e.target.value);
+
+			if (e.target.value !== "") {
+				const newRows = [...props.rows];
+				newRows.map((row) =>
+					eval(
+						`${e.target.value} ${
+							props.totalFilter === "=" ? "===" : props.totalFilter
+						} ${row.total.slice(1)}`
+					)
+						? (row.search = true)
+						: (row.search = false)
+				);
+				props.setRows(newRows);
+			} else {
+				const newRows = [...props.rows];
+				newRows.map((row) => (row.search = true));
+				props.setRows(newRows);
+			}
+		}
+	};
+
+	const filterChange = (operator) => {
+		if (props.filterPrice !== "") {
+			const newRows = [...props.rows];
+			newRows.map((row) =>
+				eval(
+					`${props.filterPrice} ${
+						operator === "=" ? "===" : operator
+					} ${row.total.slice(1)}`
+				)
+					? (row.search = true)
+					: (row.search = false)
+			);
+			props.setRows(newRows);
+		}
 	};
 
 	return (
@@ -223,7 +283,7 @@ const EnhancedTableToolbar = (props) => {
 				</Tooltip>
 			) : (
 				<Tooltip title="Filter list">
-					<IconButton>
+					<IconButton disableRipple onClick={handleClick}>
 						<FilterListIcon sx={{ fontSize: 50 }} color="secondary" />
 					</IconButton>
 				</Tooltip>
@@ -251,6 +311,72 @@ const EnhancedTableToolbar = (props) => {
 					</Button>
 				}
 			/>
+			<Menu
+				id="simple-menu"
+				anchorEl={anchorEl}
+				open={openMenu}
+				onClose={handleClose}
+				elevation={0}
+				sx={{
+					zIndex: 1302,
+					marginTop: "-3em",
+				}}
+				keepMounted
+			>
+				<MenuItem>
+					<TextField
+						value={props.filterPrice}
+						onChange={handleTotalFilter}
+						placeholder="Enter a price to filter"
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position="start">
+									<span
+										style={{
+											fontSize: "1.5rem",
+											color: theme.palette.common.orange,
+										}}
+									>
+										$
+									</span>
+								</InputAdornment>
+							),
+							endAdornment: (
+								<InputAdornment
+									onClick={() => {
+										props.setTotalFilter(
+											props.totalFilter === ">"
+												? "<"
+												: props.totalFilter === "<"
+												? "="
+												: ">"
+										);
+										filterChange(
+											props.totalFilter === ">"
+												? "<"
+												: props.totalFilter === "<"
+												? "="
+												: ">"
+										);
+									}}
+									position="end"
+									sx={{ cursor: "pointer" }}
+								>
+									<span
+										style={{
+											fontSize: "2rem",
+											color: theme.palette.common.orange,
+										}}
+									>
+										{props.totalFilter}
+									</span>
+								</InputAdornment>
+							),
+						}}
+						variant="standard"
+					/>
+				</MenuItem>
+			</Menu>
 		</Toolbar>
 	);
 };
@@ -265,6 +391,9 @@ export default function EnhancedTable(props) {
 	const [selected, setSelected] = React.useState([]);
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
+	const [filterPrice, setFilterPrice] = useState("");
+	const [totalFilter, setTotalFilter] = useState(">");
+	const theme = useTheme();
 
 	const handleRequestSort = (event, property) => {
 		const isAsc = orderBy === property && order === "asc";
@@ -319,12 +448,15 @@ export default function EnhancedTable(props) {
 		const websites = props.rows.filter((row) =>
 			websiteChecked ? row.service === "Website" : null
 		);
+
 		const iOSApps = props.rows.filter((row) =>
 			iOSChecked ? row.platforms.includes("iOS") : null
 		);
+
 		const androidApps = props.rows.filter((row) =>
 			androidChecked ? row.platforms.includes("Android") : null
 		);
+
 		const softwareApps = props.rows.filter((row) =>
 			softwareChecked ? row.service === "Custom Software" : null
 		);
@@ -332,18 +464,44 @@ export default function EnhancedTable(props) {
 		if (!websiteChecked && !iOSChecked && !androidChecked && !softwareChecked) {
 			return props.rows;
 		} else {
-			let filteredRowIds = [];
-			const rows = [...websites, ...iOSApps, ...androidApps, ...softwareApps];
-			const uniqueRows = rows.filter((row) => {
-				const toAddRow = !filteredRowIds.includes(row.id);
-				if (toAddRow) filteredRowIds.push(row.id);
-				return toAddRow;
-			});
-			return uniqueRows;
+			let newRows = websites.concat(
+				iOSApps.filter((item) => websites.indexOf(item) < 0)
+			);
+
+			let newRows2 = newRows.concat(
+				androidApps.filter((item) => newRows.indexOf(item) < 0)
+			);
+
+			let newRows3 = newRows2.concat(
+				softwareApps.filter((item) => newRows2.indexOf(item) < 0)
+			);
+
+			return newRows3;
 		}
 	};
 
-	const filteredRows = switchFilters().filter((row) => row.search);
+	const priceFilters = (switchRows) => {
+		if (filterPrice !== "") {
+			const newRows = [...switchRows];
+			newRows.map((row) =>
+				eval(
+					`${filterPrice} ${
+						totalFilter === "=" ? "===" : totalFilter
+					} ${row.total.slice(1)}`
+				)
+					? row.search === false
+						? null
+						: (row.search = true)
+					: (row.search = false)
+			);
+			return newRows;
+		}
+		return switchRows;
+	};
+
+	const filteredRows = priceFilters(switchFilters()).filter(
+		(row) => row.search
+	);
 
 	useEffect(() => {
 		setPage(0);
@@ -356,6 +514,10 @@ export default function EnhancedTable(props) {
 					rows={props.rows}
 					setRows={props.setRows}
 					selected={selected}
+					filterPrice={filterPrice}
+					setFilterPrice={setFilterPrice}
+					totalFilter={totalFilter}
+					setTotalFilter={setTotalFilter}
 					setSelected={setSelected}
 					numSelected={selected.length}
 				/>
@@ -376,7 +538,10 @@ export default function EnhancedTable(props) {
 						<TableBody>
 							{/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-							{stableSort(filteredRows, getComparator(order, orderBy))
+							{stableSort(
+								priceFilters(switchFilters()).filter((row) => row.search),
+								getComparator(order, orderBy)
+							)
 								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 								.map((row, index) => {
 									const isItemSelected = isSelected(row.id);
@@ -428,12 +593,40 @@ export default function EnhancedTable(props) {
 				<TablePagination
 					rowsPerPageOptions={[5, 10, 25]}
 					component="div"
-					count={filteredRows.length}
+					count={
+						priceFilters(switchFilters()).filter((row) => row.search).length
+					}
 					rowsPerPage={rowsPerPage}
 					page={filteredRows.length <= rowsPerPage ? 0 : page}
 					onPageChange={handleChangePage}
 					onRowsPerPageChange={handleChangeRowsPerPage}
 				/>
+				<Grid container justifyContent="flex-end">
+					<Grid item>
+						{filterPrice !== "" ? (
+							<Chip
+								onDelete={() => {
+									setFilterPrice("");
+									const newRows = [...props.rows];
+									newRows.map((row) => (row.search = true));
+									props.setRows(newRows);
+								}}
+								sx={{
+									marginRight: "2em",
+									background: theme.palette.common.blue,
+									color: "#fff",
+								}}
+								label={`${
+									totalFilter === ">"
+										? `Less than $${filterPrice}`
+										: totalFilter === "<"
+										? `Greater than $${filterPrice}`
+										: `Equal to $${filterPrice}`
+								}`}
+							/>
+						) : null}
+					</Grid>
+				</Grid>
 			</Paper>
 		</Box>
 	);
